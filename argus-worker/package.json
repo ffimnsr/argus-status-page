@@ -1,0 +1,24 @@
+{
+	"name": "argus-worker",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"generate-config": "node scripts/generate-config.mjs",
+		"predev": "npm run generate-config",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"predeploy": "npm run generate-config",
+		"deploy": "wrangler deploy",
+		"cf-typegen": "wrangler types",
+		"test": "vitest"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.12",
+		"@cloudflare/vitest-pool-workers": "^0.12.4",
+		"@types/node": "^25.6.0",
+		"smol-toml": "^1.6.1",
+		"typescript": "^5.5.2",
+		"vitest": "~3.2.0",
+		"wrangler": "^4.83.0"
+	}
+}

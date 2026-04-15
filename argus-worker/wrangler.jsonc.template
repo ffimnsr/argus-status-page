@@ -1,0 +1,47 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "argus-worker",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-03-10",
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
+	"assets": {
+		// Static status page built by Vite (frontend/) into public/
+		"directory": "./public"
+	},
+	"observability": {
+		"enabled": true
+	},
+	// ---------------------------------------------------------------------------
+	// Cron Triggers — checks run every 30 minutes by default.
+	// Adjust the expression here to change the interval.
+	// Free plan minimum: "*/2 * * * *" (every 2 minutes)
+	// Expressions: https://developers.cloudflare.com/workers/configuration/cron-triggers/
+	// ---------------------------------------------------------------------------
+	"triggers": {
+		"crons": [
+			"*/30 * * * *"
+		]
+	},
+	// ---------------------------------------------------------------------------
+	// KV Namespace — stores current status and daily history.
+	// Steps to set up:
+	//   1. Run: npx wrangler kv namespace create STATUS_KV
+	//   2. Replace the placeholder IDs below with the IDs printed by wrangler.
+	//   3. For local dev: npx wrangler kv namespace create STATUS_KV --preview
+	//      and fill in preview_id as well.
+	// ---------------------------------------------------------------------------
+	"kv_namespaces": [
+		{
+			"binding": "STATUS_KV",
+			"id": "REPLACE_WITH_PROD_ID",
+			"preview_id": "REPLACE_WITH_PREVIEW_ID"
+		}
+	]
+}

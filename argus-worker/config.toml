@@ -1,0 +1,88 @@
+# Argus Status Page — Monitor Configuration
+# Edit this file to configure your monitored sites, APIs, and WebSockets.
+# After editing, run: npm run generate-config
+# Then redeploy with: npm run deploy
+
+[settings]
+title = "Argus Status"
+description = "System status and uptime monitoring"
+history_days = 14
+
+# ---------------------------------------------------------------------------
+# monitors — add one [[monitors]] block per target
+#
+# Common fields (all monitor types):
+#   id            string  — unique identifier (used as KV key; no spaces)
+#   name          string  — display name on status page
+#   description   string  — optional description
+#   type          string  — "http" or "websocket"
+#   url           string  — target URL
+#   timeout_ms    number  — check timeout in milliseconds (default: 10000)
+#
+# HTTP-specific fields:
+#   method              string  — HTTP method (default: "GET")
+#   expect_status       number  — expected HTTP status code (default: 200)
+#   follow_redirect     bool    — follow redirects (default: false)
+#   expect_json_path    string  — dot-path into JSON body to assert (optional)
+#   expect_json_value   string  — expected string value at expect_json_path (optional)
+#
+# WebSocket-specific fields:
+#   ws_check_mode           string  — "connection" | "message" | "heartbeat"
+#                                     connection: just verify upgrade handshake succeeds
+#                                     message: wait for any message within timeout
+#                                     heartbeat: send a message and expect a specific reply
+#   heartbeat_message       string  — message to send (heartbeat mode only)
+#   expect_heartbeat_reply  string  — expected reply substring (heartbeat mode only)
+#   heartbeat_timeout_ms    number  — timeout for heartbeat reply (default: 5000)
+# ---------------------------------------------------------------------------
+
+[[monitors]]
+id = "cloudflare"
+name = "Cloudflare"
+description = "Cloudflare homepage"
+type = "http"
+url = "https://www.cloudflare.com"
+method = "GET"
+expect_status = 200
+
+[[monitors]]
+id = "workers-docs"
+name = "Workers Docs"
+description = "Cloudflare Workers documentation"
+type = "http"
+url = "https://developers.cloudflare.com/workers/"
+method = "GET"
+expect_status = 200
+follow_redirect = true
+
+# Example: API health endpoint with JSON body assertion
+# [[monitors]]
+# id = "my-api"
+# name = "My API"
+# description = "Internal REST API health endpoint"
+# type = "http"
+# url = "https://api.example.com/health"
+# method = "GET"
+# expect_status = 200
+# expect_json_path = "status"
+# expect_json_value = "ok"
+
+# Example: WebSocket — connection check only
+# [[monitors]]
+# id = "my-ws-basic"
+# name = "My WebSocket (basic)"
+# type = "websocket"
+# url = "wss://ws.example.com/socket"
+# ws_check_mode = "connection"
+# timeout_ms = 8000
+
+# Example: WebSocket — heartbeat (ping/pong)
+# [[monitors]]
+# id = "my-ws-heartbeat"
+# name = "My WebSocket (heartbeat)"
+# type = "websocket"
+# url = "wss://ws.example.com/socket"
+# ws_check_mode = "heartbeat"
+# heartbeat_message = "ping"
+# expect_heartbeat_reply = "pong"
+# heartbeat_timeout_ms = 5000

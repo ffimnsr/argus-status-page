@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+/* -------------------------------------------------------------------------
+ * Stitch Design System — "Editorial Transparency"
+ * Primary palette: deep navy + emerald green
+ * -------------------------------------------------------------------------- */
+
+@theme {
+	/* Surface hierarchy */
+	--color-background: #0b1326;
+	--color-surface-container-lowest: #060e20;
+	--color-surface-container-low: #131b2e;
+	--color-surface-container: #171f33;
+	--color-surface-container-high: #222a3d;
+	--color-surface-container-highest: #2d3449;
+	--color-surface-variant: #2d3449;
+	--color-surface-bright: #31394d;
+
+	/* Brand / semantic */
+	--color-primary: #4edea3;
+	--color-primary-container: #10b981;
+	--color-on-primary: #003824;
+	--color-secondary: #ffb95f;
+	--color-secondary-container: #ee9800;
+	--color-tertiary: #ffb3ad;
+	--color-tertiary-container: #ff7a73;
+	--color-error: #ffb4ab;
+	--color-error-container: #93000a;
+
+	/* On-colors */
+	--color-on-surface: #dae2fd;
+	--color-on-surface-variant: #bbcabf;
+	--color-outline: #86948a;
+	--color-outline-variant: #3c4a42;
+
+	/* Tint / glow */
+	--color-surface-tint: #4edea3;
+
+	/* Fonts */
+	--font-display: "Manrope", sans-serif;
+	--font-body: "Inter", sans-serif;
+}
+
+/* Base resets */
+html {
+	background-color: var(--color-background);
+	color: var(--color-on-surface);
+	font-family: var(--font-body);
+	-webkit-font-smoothing: antialiased;
+}
+
+/* Pulsing glow for healthy status indicator */
+@keyframes pulse-glow {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-primary) 30%, transparent);
+	}
+	50% {
+		box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-primary) 0%, transparent);
+	}
+}
+
+.pulse-glow {
+	animation: pulse-glow 2.4s ease-in-out infinite;
+}
+
+/* Skeleton loading shimmer */
+@keyframes shimmer {
+	0% {
+		background-position: -200% 0;
+	}
+	100% {
+		background-position: 200% 0;
+	}
+}
+
+.shimmer {
+	background: linear-gradient(
+		90deg,
+		var(--color-surface-container-low) 25%,
+		var(--color-surface-container) 50%,
+		var(--color-surface-container-low) 75%
+	);
+	background-size: 200% 100%;
+	animation: shimmer 1.6s infinite linear;
+}

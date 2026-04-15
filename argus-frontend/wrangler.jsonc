@@ -1,0 +1,20 @@
+/**
+ * Cloudflare Pages configuration.
+ * For more details: https://developers.cloudflare.com/pages/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "argus-frontend",
+	"pages_build_output_dir": "./dist",
+	// ---------------------------------------------------------------------------
+	// Environment variables — set VITE_WORKER_URL to the deployed argus-worker URL.
+	// Example: https://argus-worker.<account>.workers.dev
+	//
+	// For local development: copy .env.example → .env and fill in your values.
+	// For Cloudflare Pages CI: add VITE_WORKER_URL in the Pages project settings.
+	// ---------------------------------------------------------------------------
+	"vars": {
+		// Preview / staging worker URL (optional, override in Pages UI for production)
+		"VITE_WORKER_URL": ""
+	}
+}
