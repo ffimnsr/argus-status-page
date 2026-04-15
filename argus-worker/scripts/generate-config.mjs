@@ -63,6 +63,12 @@ const VALID_WS_MODES = new Set(["connection", "message", "heartbeat"]);
 const VALID_HTTP_METHODS = new Set(["GET", "POST", "PUT", "HEAD", "OPTIONS"]);
 const seenIds = new Set();
 
+function normalizeWebSocketMessage(value) {
+  if (value === undefined || value === null) return null;
+  if (typeof value === "string") return value;
+  return JSON.stringify(value);
+}
+
 const monitors = rawMonitors.map((m, idx) => {
   const label = `monitors[${idx}]`;
 
@@ -127,19 +133,34 @@ const monitors = rawMonitors.map((m, idx) => {
       fatal(
         `${label}: 'heartbeat_message' is required for ws_check_mode = "heartbeat"`,
       );
-    if (!m.expect_heartbeat_reply)
+    const hasReplySubstring =
+      m.expect_heartbeat_reply !== undefined && m.expect_heartbeat_reply !== null;
+    const hasReplyJsonMatcher =
+      m.expect_heartbeat_json_path !== undefined &&
+      m.expect_heartbeat_json_path !== null &&
+      m.expect_heartbeat_json_value !== undefined &&
+      m.expect_heartbeat_json_value !== null;
+
+    if (!hasReplySubstring && !hasReplyJsonMatcher)
       fatal(
-        `${label}: 'expect_heartbeat_reply' is required for ws_check_mode = "heartbeat"`,
+        `${label}: heartbeat mode requires either 'expect_heartbeat_reply' or both 'expect_heartbeat_json_path' and 'expect_heartbeat_json_value'`,
       );
   }
 
   return {
     ...base,
     ws_check_mode: wsCheckMode,
-    heartbeat_message: m.heartbeat_message ? String(m.heartbeat_message) : null,
+    heartbeat_message: normalizeWebSocketMessage(m.heartbeat_message),
     expect_heartbeat_reply: m.expect_heartbeat_reply
       ? String(m.expect_heartbeat_reply)
       : null,
+    expect_heartbeat_json_path: m.expect_heartbeat_json_path
+      ? String(m.expect_heartbeat_json_path)
+      : null,
+    expect_heartbeat_json_value:
+      m.expect_heartbeat_json_value !== undefined
+        ? String(m.expect_heartbeat_json_value)
+        : null,
     heartbeat_timeout_ms: Number(m.heartbeat_timeout_ms ?? 5000),
   };
 });

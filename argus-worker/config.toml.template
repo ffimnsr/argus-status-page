@@ -31,8 +31,11 @@ history_days = 14
 #                                     connection: just verify upgrade handshake succeeds
 #                                     message: wait for any message within timeout
 #                                     heartbeat: send a message and expect a specific reply
-#   heartbeat_message       string  — message to send (heartbeat mode only)
-#   expect_heartbeat_reply  string  — expected reply substring (heartbeat mode only)
+#   heartbeat_message       string|table — message to send (heartbeat mode only)
+#                                     tables are serialized as JSON text
+#   expect_heartbeat_reply  string       — expected reply substring (heartbeat mode only)
+#   expect_heartbeat_json_path  string   — dot-path into JSON reply (optional)
+#   expect_heartbeat_json_value string   — expected string value at JSON path (optional)
 #   heartbeat_timeout_ms    number  — timeout for heartbeat reply (default: 5000)
 # ---------------------------------------------------------------------------
 
@@ -83,6 +86,7 @@ follow_redirect = true
 # type = "websocket"
 # url = "wss://ws.example.com/socket"
 # ws_check_mode = "heartbeat"
-# heartbeat_message = "ping"
-# expect_heartbeat_reply = "pong"
+# heartbeat_message = { type = "PING" }
+# expect_heartbeat_json_path = "type"
+# expect_heartbeat_json_value = "PONG"
 # heartbeat_timeout_ms = 5000

@@ -33,6 +33,8 @@ export interface WebSocketMonitorConfig extends MonitorBase {
   ws_check_mode: "connection" | "message" | "heartbeat";
   heartbeat_message: string | null;
   expect_heartbeat_reply: string | null;
+  expect_heartbeat_json_path: string | null;
+  expect_heartbeat_json_value: string | null;
   heartbeat_timeout_ms: number;
 }
 

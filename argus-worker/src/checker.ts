@@ -126,24 +126,12 @@ export async function checkWebSocket(
     monitor.ws_check_mode === "heartbeat"
       ? monitor.heartbeat_timeout_ms
       : monitor.timeout_ms;
+  const deadline = Date.now() + timeout;
 
   try {
-    const result = await Promise.race([
-      doWebSocketCheck(monitor),
-      sleep(timeout).then(() => ({ timedOut: true as const })),
-    ]);
+    const result = await doWebSocketCheck(monitor, deadline);
 
     const responseMs = Date.now() - start;
-
-    if ("timedOut" in result) {
-      return {
-        up: false,
-        response_ms: responseMs,
-        status_code: null,
-        reason: `Timed out after ${timeout}ms`,
-        checked_at: checkedAt,
-      };
-    }
 
     return {
       up: result.up,
@@ -154,7 +142,12 @@ export async function checkWebSocket(
     };
   } catch (err: unknown) {
     const responseMs = Date.now() - start;
-    const reason = err instanceof Error ? err.message : "Unknown error";
+    const reason =
+      err instanceof Error
+        ? err.name === "AbortError" || err.name === "TimeoutError"
+          ? `Timed out after ${timeout}ms`
+          : err.message
+        : "Unknown error";
     return {
       up: false,
       response_ms: responseMs,
@@ -167,12 +160,73 @@ export async function checkWebSocket(
 
 type WsCheckOutcome = { up: boolean; reason?: string };
 
+export function toWebSocketUpgradeUrl(url: string): string {
+  const parsed = new URL(url);
+
+  if (parsed.protocol === "wss:") {
+    parsed.protocol = "https:";
+  } else if (parsed.protocol === "ws:") {
+    parsed.protocol = "http:";
+  }
+
+  return parsed.toString();
+}
+
+export function evaluateHeartbeatReply(
+  monitor: WebSocketMonitorConfig,
+  data: string,
+): WsCheckOutcome {
+  const rawReply = data.slice(0, 200);
+
+  if (
+    monitor.expect_heartbeat_json_path !== null &&
+    monitor.expect_heartbeat_json_value !== null
+  ) {
+    let payload: unknown;
+    try {
+      payload = JSON.parse(data);
+    } catch {
+      return {
+        up: false,
+        reason: `Heartbeat reply was not valid JSON: ${data.slice(0, 100)}`,
+      };
+    }
+
+    const actual = getJsonPath(payload, monitor.expect_heartbeat_json_path);
+    if (String(actual) !== monitor.expect_heartbeat_json_value) {
+      return {
+        up: false,
+        reason: `Heartbeat JSON assertion failed: ${monitor.expect_heartbeat_json_path} = ${JSON.stringify(actual)}, expected "${monitor.expect_heartbeat_json_value}", raw reply: ${JSON.stringify(rawReply)}`,
+      };
+    }
+
+    return { up: true };
+  }
+
+  if (
+    monitor.expect_heartbeat_reply !== null &&
+    data.includes(monitor.expect_heartbeat_reply)
+  ) {
+    return { up: true };
+  }
+
+  return {
+    up: false,
+    reason: `Heartbeat reply mismatch: expected "${monitor.expect_heartbeat_reply}", got "${rawReply}"`,
+  };
+}
+
 async function doWebSocketCheck(
   monitor: WebSocketMonitorConfig,
+  deadline: number,
 ): Promise<WsCheckOutcome> {
+  const handshakeTimeoutMs = Math.max(1, deadline - Date.now());
+
   // CF Workers: connect to a WebSocket server by upgrading a fetch request.
-  const resp = await fetch(monitor.url, {
+  // AbortSignal.timeout handles the handshake deadline without a manual timer.
+  const resp = await fetch(toWebSocketUpgradeUrl(monitor.url), {
     headers: { Upgrade: "websocket" },
+    signal: AbortSignal.timeout(handshakeTimeoutMs),
   });
 
   if (resp.status !== 101) {
@@ -193,54 +247,64 @@ async function doWebSocketCheck(
     return { up: true };
   }
 
-  // message or heartbeat
+  // message or heartbeat — wait for a message within the remaining deadline.
   return new Promise<WsCheckOutcome>((resolve) => {
+    let settled = false;
+    const socketTimeoutMs = Math.max(1, deadline - Date.now());
+
+    const finish = (outcome: WsCheckOutcome) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(socketTimeoutId);
+      resolve(outcome);
+    };
+
+    // Safely close without throwing on an already-closing/closed socket.
+    const closeSocket = (code = 1000, reason = "check complete") => {
+      try {
+        ws.close(code, reason);
+      } catch {
+        // ignore
+      }
+    };
+
+    const socketTimeoutId = setTimeout(() => {
+      closeSocket(1001, "check timeout");
+      finish({ up: false, reason: `Timed out after ${socketTimeoutMs}ms` });
+    }, socketTimeoutMs);
+
     ws.addEventListener("error", () => {
-      resolve({ up: false, reason: "WebSocket error event received" });
+      finish({ up: false, reason: "WebSocket error event received" });
     });
 
     ws.addEventListener("close", (event: CloseEvent) => {
-      if (event.code !== 1000 && event.code !== 1001) {
-        resolve({
-          up: false,
-          reason: `WebSocket closed unexpectedly (code ${event.code})`,
-        });
-      }
+      // The connection closed before we received a satisfying message.
+      // finish() is a no-op if the message handler already settled.
+      finish({
+        up: false,
+        reason: `WebSocket closed before check completed (code ${event.code})`,
+      });
     });
 
     ws.addEventListener("message", (event: MessageEvent) => {
       const data = typeof event.data === "string" ? event.data : "";
 
       if (monitor.ws_check_mode === "message") {
-        ws.close(1000, "check complete");
-        resolve({ up: true });
+        closeSocket();
+        finish({ up: true });
         return;
       }
 
-      // heartbeat mode — check reply
-      if (
-        monitor.expect_heartbeat_reply &&
-        data.includes(monitor.expect_heartbeat_reply)
-      ) {
-        ws.close(1000, "check complete");
-        resolve({ up: true });
-      } else {
-        ws.close(1000, "unexpected reply");
-        resolve({
-          up: false,
-          reason: `Heartbeat reply mismatch: expected "${monitor.expect_heartbeat_reply}", got "${data.slice(0, 100)}"`,
-        });
-      }
+      // heartbeat mode — evaluate reply then close regardless of outcome.
+      const outcome = evaluateHeartbeatReply(monitor, data);
+      closeSocket();
+      finish(outcome);
     });
 
     if (monitor.ws_check_mode === "heartbeat" && monitor.heartbeat_message) {
       ws.send(monitor.heartbeat_message);
     }
   });
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // ---------------------------------------------------------------------------
