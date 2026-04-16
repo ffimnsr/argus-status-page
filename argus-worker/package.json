@@ -13,12 +13,9 @@
 		"test": "vitest"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.12",
 		"@cloudflare/vitest-pool-workers": "^0.12.4",
 		"@types/node": "^25.6.0",
 		"smol-toml": "^1.6.1",
-		"typescript": "^5.5.2",
-		"vitest": "~3.2.0",
-		"wrangler": "^4.83.0"
+		"vitest": "~3.2.0"
 	}
 }

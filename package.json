@@ -1,0 +1,16 @@
+{
+  "name": "argus-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "argus-frontend",
+    "argus-worker",
+    "dev-tools"
+  ],
+  "scripts": {
+    "format": "npm run format --workspace=dev-tools",
+    "lint": "npm run lint --workspace=dev-tools",
+    "typecheck": "npm run typecheck --workspace=dev-tools",
+    "bootstrap": "npm install"
+  }
+}

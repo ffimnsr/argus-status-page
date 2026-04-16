@@ -200,7 +200,7 @@ function renderApp(
 	const nav = `
     <nav class="flex items-center justify-between px-6 py-4 max-w-4xl mx-auto w-full">
       <span class="text-lg font-bold tracking-tight" style="font-family:var(--font-display);color:var(--color-on-surface)">
-        StatusPage
+        ${escapeHtml(config.title)}
       </span>
       <button
         type="button"
@@ -295,7 +295,7 @@ function renderApp(
 	// ---- Footer -------------------------------------------------------------
 	const footer = `
     <footer class="text-center text-xs py-8" style="color:var(--color-outline)">
-      <p>StatusPage &nbsp;·&nbsp; Powered by
+      <p>Argus Status Page &nbsp;·&nbsp; Powered by
         <a href="https://pages.cloudflare.com" target="_blank" rel="noopener noreferrer"
            class="hover:underline transition-colors" style="color:var(--color-on-surface-variant)">
           Cloudflare Pages

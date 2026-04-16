@@ -3,7 +3,7 @@
  * For more details: https://developers.cloudflare.com/pages/configuration/
  */
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
+	"$schema": "../node_modules/wrangler/config-schema.json",
 	"name": "argus-frontend",
 	"pages_build_output_dir": "./dist",
 	// ---------------------------------------------------------------------------

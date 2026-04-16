@@ -1,7 +1,3 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/ffimnsr/mk-rs/main/docs/schema.json
 
-tasks:
-  greet:
-    commands:
-      - echo "Hello, World!"
-    description: Sample greet command
+tasks: {}
