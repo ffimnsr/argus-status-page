@@ -32,6 +32,8 @@ export interface WebSocketMonitorConfig extends MonitorBase {
   type: "websocket";
   ws_check_mode: "connection" | "message" | "heartbeat";
   heartbeat_message: string | null;
+  /** Zero-based index of the message to evaluate. Messages before this index are skipped. Default: 0. */
+  heartbeat_message_index: number;
   expect_heartbeat_reply: string | null;
   expect_heartbeat_json_path: string | null;
   expect_heartbeat_json_value: string | null;

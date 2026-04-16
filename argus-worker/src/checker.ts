@@ -286,6 +286,9 @@ async function doWebSocketCheck(
       });
     });
 
+    let messagesSeen = 0;
+    const targetIndex = monitor.heartbeat_message_index ?? 0;
+
     ws.addEventListener("message", (event: MessageEvent) => {
       const data = typeof event.data === "string" ? event.data : "";
 
@@ -295,7 +298,13 @@ async function doWebSocketCheck(
         return;
       }
 
-      // heartbeat mode — evaluate reply then close regardless of outcome.
+      // heartbeat mode — skip messages until we reach the target index.
+      if (messagesSeen < targetIndex) {
+        messagesSeen++;
+        return;
+      }
+
+      // Evaluate the reply at the target index then close regardless of outcome.
       const outcome = evaluateHeartbeatReply(monitor, data);
       closeSocket();
       finish(outcome);

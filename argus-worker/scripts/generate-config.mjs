@@ -151,6 +151,7 @@ const monitors = rawMonitors.map((m, idx) => {
     ...base,
     ws_check_mode: wsCheckMode,
     heartbeat_message: normalizeWebSocketMessage(m.heartbeat_message),
+    heartbeat_message_index: Number(m.heartbeat_message_index ?? 0),
     expect_heartbeat_reply: m.expect_heartbeat_reply
       ? String(m.expect_heartbeat_reply)
       : null,
