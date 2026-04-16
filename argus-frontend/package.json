@@ -1,6 +1,6 @@
 {
 	"name": "argus-frontend",
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite",
@@ -9,6 +9,7 @@
 		"typecheck": "tsc --noEmit",
 		"format": "biome format --write .",
 		"lint": "biome lint .",
+		"predeploy": "npm run build",
 		"deploy": "wrangler pages deploy dist"
 	},
 	"devDependencies": {
