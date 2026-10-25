@@ -1,86 +1,213 @@
 @import "tailwindcss";
 
 /* -------------------------------------------------------------------------
- * Stitch Design System — "Editorial Transparency"
- * Primary palette: deep navy + emerald green
+ * Argus Cyberpunk Theme System
+ * Cyberpunk Aesthetics: Dark Obsidian, Neon Cyan (#00f0ff),
+ * Neon Pink (#ff007f), Cyber Yellow (#ffe600), Neon Green (#00ff88), Crimson (#ff003c)
  * -------------------------------------------------------------------------- */
 
 @theme {
-	/* Surface hierarchy */
-	--color-background: #0b1326;
-	--color-surface-container-lowest: #060e20;
-	--color-surface-container-low: #131b2e;
-	--color-surface-container: #171f33;
-	--color-surface-container-high: #222a3d;
-	--color-surface-container-highest: #2d3449;
-	--color-surface-variant: #2d3449;
-	--color-surface-bright: #31394d;
+  /* Dark HUD Surface hierarchy */
+  --color-background: #07090e;
+  --color-surface-container-lowest: #040508;
+  --color-surface-container-low: #0c111a;
+  --color-surface-container: #111723;
+  --color-surface-container-high: #162030;
+  --color-surface-container-highest: #1e2b40;
+  --color-surface-variant: #172233;
+  --color-surface-bright: #24344d;
 
-	/* Brand / semantic */
-	--color-primary: #4edea3;
-	--color-primary-container: #10b981;
-	--color-on-primary: #003824;
-	--color-secondary: #ffb95f;
-	--color-secondary-container: #ee9800;
-	--color-tertiary: #ffb3ad;
-	--color-tertiary-container: #ff7a73;
-	--color-error: #ffb4ab;
-	--color-error-container: #93000a;
+  /* Cyberpunk Neon Accents */
+  --color-primary: #00f0ff;
+  --color-primary-container: #008fa8;
+  --color-on-primary: #000000;
 
-	/* On-colors */
-	--color-on-surface: #dae2fd;
-	--color-on-surface-variant: #bbcabf;
-	--color-outline: #86948a;
-	--color-outline-variant: #3c4a42;
+  --color-secondary: #ff007f;
+  --color-secondary-container: #a30052;
 
-	/* Tint / glow */
-	--color-surface-tint: #4edea3;
+  --color-tertiary: #ffe600;
+  --color-tertiary-container: #998a00;
 
-	/* Fonts */
-	--font-display: "Manrope", sans-serif;
-	--font-body: "Inter", sans-serif;
+  --color-success: #00ff88;
+  --color-success-container: #00a357;
+
+  --color-error: #ff003c;
+  --color-error-container: #8f0022;
+
+  /* Text / HUD Colors */
+  --color-on-surface: #e0f7fc;
+  --color-on-surface-variant: #7d9bb2;
+  --color-outline: rgba(0, 240, 255, 0.3);
+  --color-outline-variant: #1a2b3d;
+
+  /* Glow / Tint */
+  --color-surface-tint: #00f0ff;
+
+  /* Typography */
+  --font-display: "Chakra Petch", "Share Tech Mono", monospace;
+  --font-mono: "JetBrains Mono", "Share Tech Mono", monospace;
+  --font-body: "JetBrains Mono", monospace;
 }
 
-/* Base resets */
+/* Base styling */
 html {
-	background-color: var(--color-background);
-	color: var(--color-on-surface);
-	font-family: var(--font-body);
-	-webkit-font-smoothing: antialiased;
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Pulsing glow for healthy status indicator */
-@keyframes pulse-glow {
-	0%,
-	100% {
-		box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-primary) 30%, transparent);
-	}
-	50% {
-		box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-primary) 0%, transparent);
-	}
+body {
+  background-color: var(--color-background);
+  background-image:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(0, 240, 255, 0.08) 0%,
+      transparent 60%
+    ),
+    linear-gradient(rgba(0, 240, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.02) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    32px 32px,
+    32px 32px;
+  min-height: 100vh;
 }
 
-.pulse-glow {
-	animation: pulse-glow 2.4s ease-in-out infinite;
+/* Subtle scanlines effect */
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
+  background-size: 100% 4px;
+  opacity: 0.35;
 }
 
-/* Skeleton loading shimmer */
-@keyframes shimmer {
-	0% {
-		background-position: -200% 0;
-	}
-	100% {
-		background-position: 200% 0;
-	}
+/* Glowing text helpers */
+.text-glow-primary {
+  text-shadow:
+    0 0 10px rgba(0, 240, 255, 0.6),
+    0 0 20px rgba(0, 240, 255, 0.3);
+}
+
+.text-glow-success {
+  text-shadow:
+    0 0 10px rgba(0, 255, 136, 0.6),
+    0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.text-glow-error {
+  text-shadow:
+    0 0 10px rgba(255, 0, 60, 0.6),
+    0 0 20px rgba(255, 0, 60, 0.3);
+}
+
+.text-glow-warning {
+  text-shadow:
+    0 0 10px rgba(255, 230, 0, 0.6),
+    0 0 20px rgba(255, 230, 0, 0.3);
+}
+
+/* Cyber HUD panel frame styling */
+.cyber-card {
+  background: var(--color-surface-container-low);
+  border: 1px solid rgba(0, 240, 255, 0.18);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.6),
+    inset 0 0 15px rgba(0, 240, 255, 0.02);
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cyber-card::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid var(--color-primary);
+  border-left: 2px solid var(--color-primary);
+}
+
+.cyber-card::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-bottom: 2px solid var(--color-primary);
+  border-right: 2px solid var(--color-primary);
+}
+
+.cyber-card:hover {
+  border-color: rgba(0, 240, 255, 0.45);
+  box-shadow:
+    0 4px 25px rgba(0, 240, 255, 0.15),
+    inset 0 0 20px rgba(0, 240, 255, 0.05);
+}
+
+/* Pulsing cyber dot animation */
+@keyframes cyber-pulse-green {
+  0%,
+  100% {
+    box-shadow:
+      0 0 4px #00ff88,
+      0 0 0 0 rgba(0, 255, 136, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 8px #00ff88,
+      0 0 0 8px rgba(0, 255, 136, 0);
+  }
+}
+
+@keyframes cyber-pulse-red {
+  0%,
+  100% {
+    box-shadow:
+      0 0 4px #ff003c,
+      0 0 0 0 rgba(255, 0, 60, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 8px #ff003c,
+      0 0 0 8px rgba(255, 0, 60, 0);
+  }
+}
+
+.pulse-glow-green {
+  animation: cyber-pulse-green 2s ease-in-out infinite;
+}
+
+.pulse-glow-red {
+  animation: cyber-pulse-red 1.5s ease-in-out infinite;
+}
+
+/* Skeleton loading shimmer for cyber theme */
+@keyframes cyber-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .shimmer {
-	background: linear-gradient(
-		90deg,
-		var(--color-surface-container-low) 25%,
-		var(--color-surface-container) 50%,
-		var(--color-surface-container-low) 75%
-	);
-	background-size: 200% 100%;
-	animation: shimmer 1.6s infinite linear;
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-container-low) 25%,
+    var(--color-surface-container-high) 50%,
+    var(--color-surface-container-low) 75%
+  );
+  background-size: 200% 100%;
+  animation: cyber-shimmer 1.8s infinite linear;
+  border: 1px solid rgba(0, 240, 255, 0.1);
 }
