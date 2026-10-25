@@ -149,28 +149,28 @@ function renderUptimeBars(monitorId: string, days: HistoryDay[]): string {
         return `<span
           title="${escapeHtml(date)}: No data"
           class="flex-1 h-5 cursor-default min-w-0 transition-all rounded-none"
-          style="background: #0d1522; border: 1px solid rgba(0,240,255,0.08);"></span>`;
+          style="background: #090e17; border: 1px solid rgba(0,240,255,0.08);"></span>`;
       }
       const pct = d.uptime_pct;
       let bg = "var(--color-success)";
-      let shadow = "0 0 4px rgba(0, 255, 136, 0.4)";
+      let shadow = "0 0 6px rgba(0, 255, 136, 0.5)";
       if (pct < 90) {
         bg = "var(--color-error)";
-        shadow = "0 0 4px rgba(255, 0, 60, 0.5)";
+        shadow = "0 0 6px rgba(255, 0, 60, 0.6)";
       } else if (pct < 99) {
         bg = "var(--color-tertiary)";
-        shadow = "0 0 4px rgba(255, 230, 0, 0.5)";
+        shadow = "0 0 6px rgba(255, 230, 0, 0.6)";
       }
 
       const label = `${escapeHtml(date)}: ${pct}% uptime${d.avg_response_ms !== null ? ` · ${d.avg_response_ms}ms avg` : ""}`;
       return `<span
         title="${label}"
-        class="flex-1 h-5 cursor-default min-w-0 hover:scale-125 hover:z-10 transition-all rounded-none"
-        style="background:${bg}; box-shadow: ${shadow}; border: 1px solid rgba(0,0,0,0.4)"></span>`;
+        class="flex-1 h-5 cursor-default min-w-0 hover:scale-125 hover:z-20 transition-all rounded-none"
+        style="background:${bg}; box-shadow: ${shadow}; border: 1px solid rgba(0,0,0,0.5)"></span>`;
     })
     .join("");
 
-  return `<div class="flex gap-1 mt-4 p-1.5 bg-[#080d16] border border-[#162235]">${bars}</div>`;
+  return `<div class="flex gap-1 mt-4 p-1.5 bg-[#05080e] border border-[#141f30]">${bars}</div>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -179,12 +179,12 @@ function renderUptimeBars(monitorId: string, days: HistoryDay[]): string {
 
 function operationalBadge(up: boolean): string {
   if (up) {
-    return `<span class="inline-flex items-center gap-2 px-2.5 py-1 bg-[#00ff88]/10 border border-[#00ff88]/40 text-[#00ff88] text-xs font-mono font-bold tracking-wider uppercase text-glow-success">
+    return `<span class="inline-flex items-center gap-2 px-2.5 py-1 bg-[#00ff88]/10 border border-[#00ff88]/50 text-[#00ff88] text-xs font-mono font-bold tracking-wider uppercase text-glow-success cyber-flicker">
         <span class="pulse-glow-green inline-block w-2 h-2 bg-[#00ff88] flex-shrink-0"></span>
         [ OPERATIONAL ]
       </span>`;
   }
-  return `<span class="inline-flex items-center gap-2 px-2.5 py-1 bg-[#ff003c]/10 border border-[#ff003c]/40 text-[#ff003c] text-xs font-mono font-bold tracking-wider uppercase text-glow-error">
+  return `<span class="inline-flex items-center gap-2 px-2.5 py-1 bg-[#ff003c]/10 border border-[#ff003c]/50 text-[#ff003c] text-xs font-mono font-bold tracking-wider uppercase text-glow-error cyber-flicker">
       <span class="pulse-glow-red inline-block w-2 h-2 bg-[#ff003c] flex-shrink-0"></span>
       [ OUTAGE ]
     </span>`;
@@ -203,31 +203,32 @@ function renderApp(
     (m) => status.monitors[m.id]?.up !== false,
   );
   const historyDays = history.history_days;
+  const escapedTitle = escapeHtml(config.title);
 
   // ---- Nav ----------------------------------------------------------------
   const nav = `
-    <header class="border-b border-[#00f0ff]/20 bg-[#07090e]/90 backdrop-blur sticky top-0 z-40">
+    <header class="border-b border-[#00f0ff]/30 bg-[#05070c]/90 backdrop-blur sticky top-0 z-40">
       <div class="flex items-center justify-between px-6 py-3.5 max-w-5xl mx-auto w-full">
         <div class="flex items-center gap-3">
-          <div class="w-3 h-3 bg-[#00f0ff] animate-pulse" style="box-shadow: 0 0 10px #00f0ff"></div>
+          <div class="w-3 h-3 bg-[#00f0ff] animate-pulse" style="box-shadow: 0 0 12px #00f0ff"></div>
           <div>
-            <div class="text-[#00f0ff] font-mono text-xs font-semibold tracking-widest uppercase text-glow-primary">
-              // SYS_MONITOR v2.0
+            <div class="text-[#00f0ff] font-mono text-[11px] font-semibold tracking-widest uppercase text-glow-primary">
+              // SYS_MONITOR // MATRIX_GRID v2.0
             </div>
-            <h1 class="text-xl font-bold tracking-wider font-display uppercase text-[#e0f7fc]">
-              ${escapeHtml(config.title)}
+            <h1 class="text-xl font-bold tracking-wider font-display uppercase text-[#e0f7fc] glitch-text" data-text="${escapedTitle}">
+              ${escapedTitle}
             </h1>
           </div>
         </div>
         <div class="flex items-center gap-4">
-          <div class="hidden sm:flex items-center gap-2 text-xs font-mono text-[#7d9bb2] bg-[#0c111a] px-3 py-1.5 border border-[#00f0ff]/20">
-            <span class="text-[#00f0ff]">TIME:</span>
+          <div class="hidden sm:flex items-center gap-2 text-xs font-mono text-[#7d9bb2] bg-[#090e17] px-3 py-1.5 border border-[#00f0ff]/25">
+            <span class="text-[#00f0ff] font-bold">[ UTC ]</span>
             <span>${getFormattedUtc()}</span>
           </div>
           <button
             type="button"
             aria-label="Terminal"
-            class="p-2 border border-[#00f0ff]/30 text-[#00f0ff] bg-[#00f0ff]/5 hover:bg-[#00f0ff]/20 hover:border-[#00f0ff] transition-all"
+            class="p-2 border border-[#00f0ff]/40 text-[#00f0ff] bg-[#00f0ff]/10 hover:bg-[#00f0ff]/25 hover:border-[#00f0ff] transition-all shadow-[0_0_10px_rgba(0,240,255,0.2)]"
           >
             ${ICON_TERMINAL}
           </button>
@@ -236,45 +237,50 @@ function renderApp(
     </header>`;
 
   // ---- Overall status banner ----------------------------------------------
+  const bannerText = allUp
+    ? "ALL SYSTEMS OPERATIONAL"
+    : "SYSTEM DEGRADATION DETECTED";
   const banner = allUp
-    ? `<div class="cyber-card p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-l-4 border-l-[#00ff88]">
+    ? `<div class="cyber-card cyber-chamfer p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-l-4 border-l-[#00ff88] glitch-hover">
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 flex items-center justify-center bg-[#00ff88]/10 text-[#00ff88] border border-[#00ff88]/40 flex-shrink-0"
-               style="box-shadow: 0 0 15px rgba(0, 255, 136, 0.2)">
+          <div class="w-12 h-12 flex items-center justify-center bg-[#00ff88]/15 text-[#00ff88] border border-[#00ff88]/50 flex-shrink-0"
+               style="box-shadow: 0 0 20px rgba(0, 255, 136, 0.25)">
             ${ICON_CHECK}
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-xs font-mono text-[#00ff88] uppercase tracking-widest font-semibold">[ STATUS: NORMAL ]</span>
+              <span class="text-[11px] font-mono text-[#00ff88] uppercase tracking-widest font-bold">[ MATRIX_STATUS: NORMAL ]</span>
+              <span class="text-[10px] font-mono text-[#7d9bb2] bg-[#00ff88]/10 px-1.5 py-0.5 border border-[#00ff88]/30">GRID_OK</span>
             </div>
-            <h2 class="text-xl font-bold font-display uppercase tracking-wide text-[#e0f7fc] text-glow-success mt-0.5">
-              ALL SYSTEMS OPERATIONAL
+            <h2 class="text-xl font-bold font-display uppercase tracking-wide text-[#e0f7fc] text-glow-success mt-0.5 glitch-text glitch-target" data-text="${bannerText}">
+              ${bannerText}
             </h2>
             <p class="text-xs font-mono text-[#7d9bb2] mt-1">
-              SYS_CHECK: PASSED &nbsp;·&nbsp; LAST_SCAN: ${escapeHtml(timeAgo(status.last_checked))} &nbsp;·&nbsp; ALL NODES HEALTHY
+              SYS_CHECK: PASSED &nbsp;·&nbsp; LAST_SCAN: ${escapeHtml(timeAgo(status.last_checked))} &nbsp;·&nbsp; TELEMETRY_ACTIVE
             </p>
           </div>
         </div>
         <div class="text-right hidden sm:block">
-          <div class="text-xs font-mono text-[#7d9bb2]">GLOBAL UPTIME</div>
+          <div class="text-[10px] font-mono text-[#7d9bb2] tracking-widest">GLOBAL UPTIME</div>
           <div class="text-2xl font-bold font-mono text-[#00ff88] text-glow-success">100.0%</div>
         </div>
       </div>`
-    : `<div class="cyber-card p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-l-4 border-l-[#ff003c]">
+    : `<div class="cyber-card cyber-chamfer p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-l-4 border-l-[#ff003c] glitch-hover">
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 flex items-center justify-center bg-[#ff003c]/10 text-[#ff003c] border border-[#ff003c]/40 flex-shrink-0"
-               style="box-shadow: 0 0 15px rgba(255, 0, 60, 0.2)">
+          <div class="w-12 h-12 flex items-center justify-center bg-[#ff003c]/15 text-[#ff003c] border border-[#ff003c]/50 flex-shrink-0"
+               style="box-shadow: 0 0 20px rgba(255, 0, 60, 0.25)">
             ${ICON_ALERT}
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-xs font-mono text-[#ff003c] uppercase tracking-widest font-semibold">[ STATUS: DEGRADED ]</span>
+              <span class="text-[11px] font-mono text-[#ff003c] uppercase tracking-widest font-bold">[ MATRIX_STATUS: CRITICAL ]</span>
+              <span class="text-[10px] font-mono text-[#ff003c] bg-[#ff003c]/10 px-1.5 py-0.5 border border-[#ff003c]/30 animate-pulse">ALERT</span>
             </div>
-            <h2 class="text-xl font-bold font-display uppercase tracking-wide text-[#e0f7fc] text-glow-error mt-0.5">
-              SYSTEM DEGRADATION DETECTED
+            <h2 class="text-xl font-bold font-display uppercase tracking-wide text-[#e0f7fc] text-glow-error mt-0.5 glitch-text glitch-target" data-text="${bannerText}">
+              ${bannerText}
             </h2>
             <p class="text-xs font-mono text-[#7d9bb2] mt-1">
-              ALERT: INCIDENT ACTIVE &nbsp;·&nbsp; LAST_SCAN: ${escapeHtml(timeAgo(status.last_checked))} &nbsp;·&nbsp; ENGINEERS NOTIFIED
+              INCIDENT_ACTIVE &nbsp;·&nbsp; LAST_SCAN: ${escapeHtml(timeAgo(status.last_checked))} &nbsp;·&nbsp; AUTOMATED DIAGNOSTICS RUNNING
             </p>
           </div>
         </div>
@@ -293,17 +299,18 @@ function renderApp(
       const statusCode = cur?.status_code
         ? `HTTP ${cur.status_code}`
         : m.type.toUpperCase();
+      const escapedName = escapeHtml(m.name);
 
       return `
-      <div class="cyber-card p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#00f0ff]/10 pb-4">
+      <div class="cyber-card p-6 glitch-hover">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#00f0ff]/15 pb-4">
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-[10px] font-mono uppercase px-2 py-0.5 bg-[#00f0ff]/10 border border-[#00f0ff]/30 text-[#00f0ff]">
+              <span class="text-[10px] font-mono uppercase px-2 py-0.5 bg-[#00f0ff]/10 border border-[#00f0ff]/40 text-[#00f0ff]">
                 ${statusCode}
               </span>
-              <h3 class="font-display font-bold text-lg text-[#e0f7fc] tracking-wide">
-                ${escapeHtml(m.name)}
+              <h3 class="font-display font-bold text-lg text-[#e0f7fc] tracking-wide glitch-target">
+                ${escapedName}
               </h3>
             </div>
             ${
@@ -314,8 +321,8 @@ function renderApp(
           </div>
           <div class="flex items-center gap-4 self-start sm:self-center">
             <div class="text-right hidden md:block">
-              <div class="text-[10px] font-mono text-[#7d9bb2]">LATENCY</div>
-              <div class="text-xs font-mono font-semibold text-[#00f0ff]">${latency}</div>
+              <div class="text-[10px] font-mono text-[#7d9bb2] tracking-wider">LATENCY</div>
+              <div class="text-xs font-mono font-semibold text-[#00f0ff] text-glow-primary">${latency}</div>
             </div>
             <div>
               ${operationalBadge(up)}
@@ -325,7 +332,7 @@ function renderApp(
 
         ${
           !up && cur?.reason
-            ? `<div class="mt-3 text-xs font-mono p-3 bg-[#ff003c]/10 border border-[#ff003c]/30 text-[#ff003c]">
+            ? `<div class="mt-3 text-xs font-mono p-3 bg-[#ff003c]/15 border border-[#ff003c]/40 text-[#ff003c]">
                [ ERROR_LOG ]: ${escapeHtml(cur.reason)}
              </div>`
             : ""
@@ -335,7 +342,7 @@ function renderApp(
 
         <div class="flex items-center justify-between mt-3 font-mono text-[11px] text-[#7d9bb2]">
           <span>${historyDays} DAYS AGO</span>
-          <span class="text-[#00f0ff] font-semibold">${uptime} UPTIME</span>
+          <span class="text-[#00f0ff] font-semibold text-glow-primary">${uptime} UPTIME</span>
           <span>PRESENT</span>
         </div>
       </div>`;
@@ -344,22 +351,22 @@ function renderApp(
 
   // ---- Footer -------------------------------------------------------------
   const footer = `
-    <footer class="mt-12 border-t border-[#00f0ff]/20 py-8 text-center font-mono text-xs text-[#7d9bb2]">
+    <footer class="mt-12 border-t border-[#00f0ff]/30 py-8 text-center font-mono text-xs text-[#7d9bb2]">
       <div class="max-w-5xl mx-auto px-6 space-y-2">
         <p>
-          <span class="text-[#00f0ff]">// ARGUS STATUS PAGE</span> &nbsp;·&nbsp; POWERED BY
+          <span class="text-[#00f0ff]">// ARGUS STATUS SYSTEM</span> &nbsp;·&nbsp; POWERED BY
           <a href="https://pages.cloudflare.com" target="_blank" rel="noopener noreferrer"
-             class="text-[#e0f7fc] hover:text-[#00f0ff] underline decoration-[#00f0ff]/40 transition-colors">
+             class="text-[#e0f7fc] hover:text-[#00f0ff] underline decoration-[#00f0ff]/50 transition-colors">
             CLOUDFLARE_PAGES
           </a>
           &amp;
           <a href="https://workers.cloudflare.com" target="_blank" rel="noopener noreferrer"
-             class="text-[#e0f7fc] hover:text-[#00f0ff] underline decoration-[#00f0ff]/40 transition-colors">
+             class="text-[#e0f7fc] hover:text-[#00f0ff] underline decoration-[#00f0ff]/50 transition-colors">
             CLOUDFLARE_WORKERS
           </a>
         </p>
         <p class="text-[11px] opacity-70">
-          © ${new Date().getFullYear()} ${escapeHtml(config.title)} &nbsp;·&nbsp; AUTO_REFRESH: 60s
+          © ${new Date().getFullYear()} ${escapedTitle} &nbsp;·&nbsp; REFRESH_RATE: 60s &nbsp;·&nbsp; MATRIX_GRID_ACTIVE
         </p>
       </div>
     </footer>`;
@@ -367,16 +374,16 @@ function renderApp(
   // ---- Assemble -----------------------------------------------------------
   const html = `
     <div class="scanlines"></div>
-    <div class="min-h-screen flex flex-col">
+    <div class="min-h-screen flex flex-col relative z-10">
       ${nav}
       <main class="max-w-5xl mx-auto px-6 pt-8 pb-16 space-y-6 flex-1 w-full">
         ${banner}
         <section class="space-y-4">
           <div class="flex items-center justify-between border-b border-[#00f0ff]/20 pb-2">
-            <h3 class="font-display font-bold text-sm uppercase tracking-widest text-[#00f0ff]">
+            <h3 class="font-display font-bold text-sm uppercase tracking-widest text-[#00f0ff] text-glow-primary">
               // MONITORED_SERVICES [ ${config.monitors.length} ]
             </h3>
-            <span class="text-xs font-mono text-[#7d9bb2]">REFRESH_INTERVAL: 60s</span>
+            <span class="text-xs font-mono text-[#7d9bb2]">[ AUTO_REFRESH: 60s ]</span>
           </div>
           ${cards}
         </section>
@@ -417,14 +424,16 @@ function renderLoading(): void {
   if (!app) return;
   app.innerHTML = `
     <div class="scanlines"></div>
-    <div class="min-h-screen flex flex-col">
-      <header class="border-b border-[#00f0ff]/20 bg-[#07090e] py-4 px-6">
+    <div class="min-h-screen flex flex-col relative z-10">
+      <header class="border-b border-[#00f0ff]/20 bg-[#05070c] py-4 px-6">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
-          <span class="font-display font-bold text-lg text-[#00f0ff] uppercase tracking-wider">// ARGUS // STATUS_LOADING...</span>
+          <span class="font-display font-bold text-lg text-[#00f0ff] uppercase tracking-wider glitch-text" data-text="// ARGUS // CONNECTING_MATRIX...">
+            // ARGUS // CONNECTING_MATRIX...
+          </span>
         </div>
       </header>
       <main class="max-w-5xl mx-auto px-6 py-8 space-y-6 flex-1 w-full">
-        <div class="shimmer h-28 w-full border border-[#00f0ff]/20"></div>
+        <div class="shimmer h-28 w-full border border-[#00f0ff]/20 cyber-chamfer"></div>
         <section class="space-y-4">
           ${[0, 1, 2].map(() => skeletonCard).join("")}
         </section>
@@ -441,22 +450,22 @@ function renderError(msg: string): void {
   if (!app) return;
   app.innerHTML = `
     <div class="scanlines"></div>
-    <div class="min-h-screen flex items-center justify-center p-6">
-      <div class="cyber-card max-w-lg w-full p-6 border-l-4 border-l-[#ff003c]">
+    <div class="min-h-screen flex items-center justify-center p-6 relative z-10">
+      <div class="cyber-card cyber-chamfer max-w-lg w-full p-6 border-l-4 border-l-[#ff003c]">
         <div class="flex items-center gap-3 text-[#ff003c]">
           ${ICON_ALERT}
-          <h3 class="font-display font-bold text-lg uppercase tracking-wider text-glow-error">
-            [ SYSTEM CONNECTION ERROR ]
+          <h3 class="font-display font-bold text-lg uppercase tracking-wider text-glow-error glitch-text" data-text="[ MATRIX CONNECTION ERROR ]">
+            [ MATRIX CONNECTION ERROR ]
           </h3>
         </div>
         <p class="text-xs font-mono text-[#7d9bb2] mt-3">
           CRITICAL: Unable to synchronize telemetry from Argus Worker endpoint.
         </p>
-        <div class="mt-4 p-3 bg-[#ff003c]/10 border border-[#ff003c]/30 text-xs font-mono text-[#ff003c]">
+        <div class="mt-4 p-3 bg-[#ff003c]/15 border border-[#ff003c]/40 text-xs font-mono text-[#ff003c]">
           DETAILS: ${escapeHtml(msg)}
         </div>
         <button onclick="window.location.reload()"
-                class="mt-5 w-full py-2.5 bg-[#00f0ff]/10 hover:bg-[#00f0ff]/20 border border-[#00f0ff] text-[#00f0ff] font-mono text-xs uppercase font-bold tracking-wider transition-all">
+                class="mt-5 w-full py-2.5 bg-[#00f0ff]/15 hover:bg-[#00f0ff]/30 border border-[#00f0ff] text-[#00f0ff] font-mono text-xs uppercase font-bold tracking-wider transition-all shadow-[0_0_15px_rgba(0,240,255,0.2)]">
           [ RECONNECT TO MATRIX ]
         </button>
       </div>
